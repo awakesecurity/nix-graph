@@ -10,7 +10,7 @@ maintainer:  Arista Networks <opensource@awakesecurity.com>
 homepage:    https://github.com/awakesecurity/nix-graph
 license:     BSD-3-Clause
 copyright:   2021 Arista Networks
-tested-with: GHC == 8.8.4, GHC == 8.10.4
+tested-with: GHC == 8.6.5, GHC == 8.8.4, GHC == 8.10.4
 
 license-file: LICENSE
 extra-source-files:
@@ -19,7 +19,7 @@ extra-source-files:
   README.md
 
 common common
-  build-depends: base >= 4.13 && < 5.0
+  build-depends: base >= 4.12 && < 5.0
   default-language: Haskell2010
   ghc-options:
     -Wall
@@ -63,4 +63,4 @@ executable nix-graph
   build-depends:
     , algebraic-graphs
     , nix-graph
-    , optparse-applicative >= 0.15.0.0
+    , optparse-applicative >= 0.14.0.0

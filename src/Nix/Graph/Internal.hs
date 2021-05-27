@@ -1,4 +1,5 @@
 {-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
@@ -36,6 +37,14 @@ import qualified UnliftIO.Exception as Exception
 import qualified UnliftIO.IO as IO
 import qualified UnliftIO.Process as Process
 import qualified UnliftIO.STM as STM
+
+-- Support `MonadFail` on GHC 8.6.5
+#if MIN_VERSION_base(4,9,0)
+import Control.Monad.Fail (MonadFail)
+#endif
+#if MIN_VERSION_base(4,13,0)
+import Prelude hiding (MonadFail)
+#endif
 
 data Derivation = Derivation
   { derivationPath :: FilePath
