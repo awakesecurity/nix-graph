@@ -8,5 +8,7 @@ nix-graph.env.overrideAttrs (old: {
   buildInputs = (old.buildInputs or []) ++ [
     pkgs.cabal-install
     pkgs.ghcid
+    pkgs.haskellPackages.fourmolu
+    pkgs.nixpkgs-fmt
   ];
 })
