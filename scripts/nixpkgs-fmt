@@ -2,11 +2,6 @@
 
 set -euo pipefail
 
-if [ "$#" -eq 0 ]; then
-  echo "Please specify the command-line options to pass to 'nixpkgs-fmt'" >&2
-  exit 1
-fi
-
 git_root=$(git rev-parse --show-toplevel)
 
 nixpkgs_fmt=$(nix-build "${git_root}/nix/pkgs.nix" --attr nixpkgs-fmt  --no-out-link)
