@@ -168,15 +168,15 @@ data Exclude
   deriving stock (Eq)
 
 -- | Build graph of dependencies
-build ::
+buildFull ::
   MonadIO m =>
   -- | Configure how the graph is built
   Config ->
   -- | Derivations to build graph from
   [FilePath] ->
   m (AdjacencyMap Derivation)
-build _ [] = pure (AdjacencyMap.empty)
-build Config{exclude, maxFiles} roots = liftIO $ do
+buildFull _ [] = pure (AdjacencyMap.empty)
+buildFull Config{exclude, maxFiles} roots = liftIO $ do
   tSem <- STM.atomically $ TSem.newTSem (toInteger maxFiles)
 
   process :: [FilePath] -> IO [Derivation] <- do
@@ -206,3 +206,14 @@ build Config{exclude, maxFiles} roots = liftIO $ do
   adjacencySets <- buildAdjacencyMap getInputDrvs rootDrvs
 
   pure (AdjacencyMap.fromAdjacencySets adjacencySets)
+
+-- | Build graph of dependencies as FilePaths
+build ::
+  MonadIO m =>
+  -- | Configure how the graph is built
+  Config ->
+  -- | Derivations to build graph from
+  [FilePath] ->
+  m (AdjacencyMap FilePath)
+build cfg roots =
+  AdjacencyMap.gmap derivationPath <$> buildFull cfg roots
