@@ -18,6 +18,7 @@ import Control.Monad.IO.Class (MonadIO (..))
 import Data.Attoparsec.Text ((<?>))
 import Data.Hashable (Hashable)
 import Data.Set (Set)
+import Data.Text (Text)
 import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
 import System.Exit (ExitCode (..))
@@ -48,7 +49,7 @@ import Prelude hiding (MonadFail)
 
 data Derivation = Derivation
   { derivationPath :: FilePath
-  , derivationSystem :: Text.Text
+  , derivationSystem :: Text
   , derivationInputDrvs :: [FilePath]
   , derivationBuilt :: Bool
   }
