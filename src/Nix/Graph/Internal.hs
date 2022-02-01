@@ -48,6 +48,7 @@ import Prelude hiding (MonadFail)
 
 data Derivation = Derivation
   { derivationPath :: FilePath
+  , derivationSystem :: Text.Text
   , derivationInputDrvs :: [FilePath]
   , derivationBuilt :: Bool
   }
@@ -75,7 +76,9 @@ readDerivation tSem derivationPath = do
 
   let derivationInputDrvs = Map.keys (Nix.Derivation.inputDrvs drv)
 
-  pure Derivation{derivationPath, derivationBuilt, derivationInputDrvs}
+  let derivationSystem = Nix.Derivation.platform drv
+
+  pure Derivation{derivationPath, derivationBuilt, derivationSystem, derivationInputDrvs}
 
 buildAdjacencyMap ::
   MonadIO m =>
@@ -171,7 +174,7 @@ build ::
   Config ->
   -- | Derivations to build graph from
   [FilePath] ->
-  m (AdjacencyMap FilePath)
+  m (AdjacencyMap Derivation)
 build _ [] = pure (AdjacencyMap.empty)
 build Config{exclude, maxFiles} roots = liftIO $ do
   tSem <- STM.atomically $ TSem.newTSem (toInteger maxFiles)
@@ -202,6 +205,4 @@ build Config{exclude, maxFiles} roots = liftIO $ do
 
   adjacencySets <- buildAdjacencyMap getInputDrvs rootDrvs
 
-  let adjacencyMap = AdjacencyMap.fromAdjacencySets adjacencySets
-
-  pure (AdjacencyMap.gmap derivationPath adjacencyMap)
+  pure (AdjacencyMap.fromAdjacencySets adjacencySets)
