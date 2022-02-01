@@ -15,7 +15,7 @@ jobs:
         with:
           install_url: https://releases.nixos.org/nix/nix-2.6.0/install
           nix_path: nixpkgs=./nix/pkgs.nix
-      - uses: cachix/cachix-action@v8
+      - uses: cachix/cachix-action@v10
         name: Set up Cachix
         with:
           name: awakesecurity
@@ -31,7 +31,7 @@ jobs:
         with:
           install_url: https://releases.nixos.org/nix/nix-2.6.0/install
           nix_path: nixpkgs=./nix/pkgs.nix
-      - uses: cachix/cachix-action@v8
+      - uses: cachix/cachix-action@v10
         name: Set up Cachix
         with:
           name: awakesecurity
