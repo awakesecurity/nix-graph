@@ -1,5 +1,6 @@
 module Nix.Graph (
   Config (..),
+  Derivation (..),
   Exclude (..),
   build,
   buildFull,
