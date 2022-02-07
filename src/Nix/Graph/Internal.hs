@@ -18,6 +18,7 @@ import Control.Monad.IO.Class (MonadIO (..))
 import Data.Attoparsec.Text ((<?>))
 import Data.Hashable (Hashable)
 import Data.Set (Set)
+import Data.Text (Text)
 import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
 import System.Exit (ExitCode (..))
@@ -48,6 +49,7 @@ import Prelude hiding (MonadFail)
 
 data Derivation = Derivation
   { derivationPath :: FilePath
+  , derivationSystem :: Text
   , derivationInputDrvs :: [FilePath]
   , derivationBuilt :: Bool
   }
@@ -75,7 +77,9 @@ readDerivation tSem derivationPath = do
 
   let derivationInputDrvs = Map.keys (Nix.Derivation.inputDrvs drv)
 
-  pure Derivation{derivationPath, derivationBuilt, derivationInputDrvs}
+  let derivationSystem = Nix.Derivation.platform drv
+
+  pure Derivation{derivationPath, derivationBuilt, derivationSystem, derivationInputDrvs}
 
 buildAdjacencyMap ::
   MonadIO m =>
@@ -165,15 +169,15 @@ data Exclude
   deriving stock (Eq)
 
 -- | Build graph of dependencies
-build ::
+buildFull ::
   MonadIO m =>
   -- | Configure how the graph is built
   Config ->
   -- | Derivations to build graph from
   [FilePath] ->
-  m (AdjacencyMap FilePath)
-build _ [] = pure (AdjacencyMap.empty)
-build Config{exclude, maxFiles} roots = liftIO $ do
+  m (AdjacencyMap Derivation)
+buildFull _ [] = pure (AdjacencyMap.empty)
+buildFull Config{exclude, maxFiles} roots = liftIO $ do
   tSem <- STM.atomically $ TSem.newTSem (toInteger maxFiles)
 
   process :: [FilePath] -> IO [Derivation] <- do
@@ -202,6 +206,15 @@ build Config{exclude, maxFiles} roots = liftIO $ do
 
   adjacencySets <- buildAdjacencyMap getInputDrvs rootDrvs
 
-  let adjacencyMap = AdjacencyMap.fromAdjacencySets adjacencySets
+  pure (AdjacencyMap.fromAdjacencySets adjacencySets)
 
-  pure (AdjacencyMap.gmap derivationPath adjacencyMap)
+-- | Build graph of dependencies as FilePaths
+build ::
+  MonadIO m =>
+  -- | Configure how the graph is built
+  Config ->
+  -- | Derivations to build graph from
+  [FilePath] ->
+  m (AdjacencyMap FilePath)
+build cfg roots =
+  AdjacencyMap.gmap derivationPath <$> buildFull cfg roots
