@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog][changelog], and this project adheres
 to the [Haskell Package Versioning Policy][pvp].
 
 ## [Unreleased]
+### Added
+- New function `buildFull` to get back the nix graph of Derivations instead of FilePaths.
 
 ## [1.0.0.0] - 2021-05-27
 
