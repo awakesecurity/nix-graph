@@ -9,7 +9,7 @@ author:      Arista Networks <opensource@awakesecurity.com>
 maintainer:  Arista Networks <opensource@awakesecurity.com>
 homepage:    https://github.com/awakesecurity/nix-graph
 license:     BSD-3-Clause
-copyright:   2021 Arista Networks
+copyright:   2022 Arista Networks
 tested-with: GHC == 8.6.5, GHC == 8.8.4, GHC == 8.10.4
 
 license-file: LICENSE
