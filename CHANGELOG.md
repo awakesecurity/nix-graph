@@ -7,6 +7,10 @@ to the [Haskell Package Versioning Policy][pvp].
 
 ## [Unreleased]
 
+## [1.0.2.0] - 2022-05-12
+### Added
+- New field `derivationEnv` of `Derivation`.
+
 ## [1.0.1.0] - 2022-02-09
 ### Added
 - New function `buildFull` to get back the nix graph of Derivations instead of FilePaths.
