@@ -1,7 +1,7 @@
 cabal-version: 2.2
 
 name:        nix-graph
-version:     1.0.1.0
+version:     1.0.2.0
 synopsis:    Reify the Nix build graph into a Haskell graph data structure
 description: Reify the Nix build graph into a Haskell graph data structure
 category:    Nix, Graphs
