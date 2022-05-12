@@ -27,8 +27,8 @@ import qualified Algebra.Graph.AdjacencyMap as AdjacencyMap
 import qualified Control.Concurrent.STM.Map as STM.Map
 import qualified Control.Concurrent.STM.TSem as TSem
 import qualified Data.Attoparsec.Text as Attoparsec
-import qualified Data.Map as Map
-import qualified Data.Map.Strict as MapS
+import qualified Data.Map as LMap
+import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text.IO
@@ -53,7 +53,7 @@ data Derivation = Derivation
   , derivationSystem :: Text
   , derivationInputDrvs :: [FilePath]
   , derivationBuilt :: Bool
-  , derivationEnv :: MapS.Map Text Text
+  , derivationEnv :: Map.Map Text Text
   }
   deriving stock (Eq, Ord, Generic)
 
@@ -73,13 +73,13 @@ readDerivation tSem derivationPath = do
         Right drv -> pure drv
 
   outputPath <-
-    case Map.lookup "out" (Nix.Derivation.outputs drv) of
+    case LMap.lookup "out" (Nix.Derivation.outputs drv) of
       Nothing -> fail "Failed to lookup output path"
       Just output -> pure (Nix.Derivation.path output)
 
   derivationBuilt <- Directory.doesPathExist outputPath
 
-  let derivationInputDrvs = Map.keys (Nix.Derivation.inputDrvs drv)
+  let derivationInputDrvs = LMap.keys (Nix.Derivation.inputDrvs drv)
 
   let derivationSystem = Nix.Derivation.platform drv
 
