@@ -27,8 +27,8 @@ import qualified Algebra.Graph.AdjacencyMap as AdjacencyMap
 import qualified Control.Concurrent.STM.Map as STM.Map
 import qualified Control.Concurrent.STM.TSem as TSem
 import qualified Data.Attoparsec.Text as Attoparsec
-import qualified Data.Map as LMap
-import qualified Data.Map.Strict as Map
+import qualified Data.HashMap.Strict as HashMap
+import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text.IO
@@ -53,12 +53,10 @@ data Derivation = Derivation
   , derivationSystem :: Text
   , derivationInputDrvs :: [FilePath]
   , derivationBuilt :: Bool
-  , derivationEnv :: Map.Map Text Text
+  , derivationEnv :: HashMap.HashMap Text Text
   }
   deriving stock (Eq, Ord, Generic)
-
-instance Hashable Derivation where
-  hashWithSalt s = hashWithSalt s . derivationPath
+  deriving anyclass (Hashable)
 
 readDerivation :: (MonadIO m, MonadFail m) => TSem -> FilePath -> m Derivation
 readDerivation tSem derivationPath = do
@@ -73,17 +71,17 @@ readDerivation tSem derivationPath = do
         Right drv -> pure drv
 
   outputPath <-
-    case LMap.lookup "out" (Nix.Derivation.outputs drv) of
+    case Map.lookup "out" (Nix.Derivation.outputs drv) of
       Nothing -> fail "Failed to lookup output path"
       Just output -> pure (Nix.Derivation.path output)
 
   derivationBuilt <- Directory.doesPathExist outputPath
 
-  let derivationInputDrvs = LMap.keys (Nix.Derivation.inputDrvs drv)
+  let derivationInputDrvs = Map.keys (Nix.Derivation.inputDrvs drv)
 
   let derivationSystem = Nix.Derivation.platform drv
 
-  let derivationEnv = Nix.Derivation.env drv
+  let derivationEnv = HashMap.fromList (Map.toList (Nix.Derivation.env drv))
 
   pure
     Derivation
