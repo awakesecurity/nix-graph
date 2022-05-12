@@ -16,7 +16,7 @@ import Control.Concurrent.STM.TSem (TSem)
 import Control.Monad (unless, when)
 import Control.Monad.IO.Class (MonadIO (..))
 import Data.Attoparsec.Text ((<?>))
-import Data.Hashable (Hashable)
+import Data.Hashable (Hashable (..))
 import Data.Set (Set)
 import Data.Text (Text)
 import GHC.Generics (Generic)
@@ -28,6 +28,7 @@ import qualified Control.Concurrent.STM.Map as STM.Map
 import qualified Control.Concurrent.STM.TSem as TSem
 import qualified Data.Attoparsec.Text as Attoparsec
 import qualified Data.Map as Map
+import qualified Data.Map.Strict as MapS
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text.IO
@@ -52,9 +53,12 @@ data Derivation = Derivation
   , derivationSystem :: Text
   , derivationInputDrvs :: [FilePath]
   , derivationBuilt :: Bool
+  , derivationEnv :: MapS.Map Text Text
   }
   deriving stock (Eq, Ord, Generic)
-  deriving anyclass (Hashable)
+
+instance Hashable Derivation where
+  hashWithSalt s = hashWithSalt s . derivationPath
 
 readDerivation :: (MonadIO m, MonadFail m) => TSem -> FilePath -> m Derivation
 readDerivation tSem derivationPath = do
@@ -79,7 +83,16 @@ readDerivation tSem derivationPath = do
 
   let derivationSystem = Nix.Derivation.platform drv
 
-  pure Derivation{derivationPath, derivationBuilt, derivationSystem, derivationInputDrvs}
+  let derivationEnv = Nix.Derivation.env drv
+
+  pure
+    Derivation
+      { derivationPath
+      , derivationBuilt
+      , derivationSystem
+      , derivationInputDrvs
+      , derivationEnv
+      }
 
 buildAdjacencyMap ::
   MonadIO m =>
