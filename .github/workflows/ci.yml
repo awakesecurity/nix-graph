@@ -13,7 +13,6 @@ jobs:
       - uses: cachix/install-nix-action@v22
         name: Install Nix
         with:
-          install_url: https://releases.nixos.org/nix/nix-2.6.0/install
           nix_path: nixpkgs=./nix/pkgs.nix
       - uses: cachix/cachix-action@v12
         name: Set up Cachix
@@ -29,7 +28,6 @@ jobs:
       - uses: cachix/install-nix-action@v22
         name: Install Nix
         with:
-          install_url: https://releases.nixos.org/nix/nix-2.6.0/install
           nix_path: nixpkgs=./nix/pkgs.nix
       - uses: cachix/cachix-action@v12
         name: Set up Cachix
